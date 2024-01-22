@@ -1,0 +1,53 @@
+version: '3.10'
+
+volumes:
+  pgdata:
+
+networks:
+  backend:
+
+services:
+
+  pg_db:
+    image: postgres:14.3-alpine3.16
+    container_name: menu_db
+    environment:
+      POSTGRES_DB: menu_pgdb
+      POSTGRES_USER: adm
+      POSTGRES_PASSWORD: 111
+    ports:
+      - '5431:5432'
+#      POSTGRES_DB: ${DB_NAME}
+#      POSTGRES_USER: ${DB_USER}
+#      POSTGRES_PASSWORD: ${DB_PASSWORD}
+#    ports:
+#      - '5431:${DB_PORT}'
+    networks:
+      - backend
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 128M
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    ports:
+      - "5050:80"
+    container_name: pgadmin
+    depends_on:
+      - pg_db
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "def@mail.ru"
+      PGADMIN_DEFAULT_PASSWORD: "111"
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    volumes:
+      - ./services/pgadmin:/var/lib/pgadmin
+    networks:
+      - backend
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
+
