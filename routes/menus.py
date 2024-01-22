@@ -24,7 +24,7 @@ def menu_dump(menu: Menu) -> dict:
     }
 
 
-@menus_router.post("", response_model=Menu)
+@menus_router.post("/", response_model=Menu)
 async def add_menu(menu_data: Menu, session=Depends(get_session)) -> json:
     session.add(menu_data)
     session.commit()
