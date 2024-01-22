@@ -87,15 +87,14 @@ async def update_menu(menu_data: Menu,
 async def delete_menu(menu_id: str, session=Depends(get_session)) -> json:
     menu = session.get(Menu, menu_id)
     if menu:
-        session.delete(menu_id)
+        session.delete(menu)
         session.commit()
-        session.refresh(menu)
         return JSONResponse(
-            content={"status": true, "message": "The menu has been deleted"},
+            content={"status": True, "message": "The menu has been deleted"},
             media_type="application/json",
             status_code=200
         )
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
-        detail="menu not found"
+        detail="menu -----" + menu_id + "------ not found!"
     )
