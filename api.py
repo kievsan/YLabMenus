@@ -7,10 +7,12 @@ import uvicorn
 from database.connection import conn
 
 from routes.menus import menus_router
+from routes.submenus import submenus_router
 
 app = FastAPI()
 
 app.include_router(menus_router, prefix=f"{API_PATH}")
+app.include_router(submenus_router, prefix=f"{API_PATH}")
 
 
 @app.on_event("startup")

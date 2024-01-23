@@ -2,14 +2,11 @@ import json
 from typing import List
 
 from fastapi import APIRouter, Path, Depends, HTTPException, Request, status
-from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
-from sqlalchemy import true
 from sqlmodel import select
 
-from const import API_PATH
 from database.connection import get_session
-from models.menus import BaseModel, Menu, Submenu, Dish
+from models.menus_tree import Menu, Submenu, Dish
 
 menus_router = APIRouter(prefix=f"/menus", tags=["Menu"])
 
@@ -26,7 +23,12 @@ def menu_dump(menu: Menu) -> dict:
 
 @menus_router.post("/", response_model=Menu)
 async def add_menu(menu_data: Menu, session=Depends(get_session)) -> json:
-    session.add(menu_data)
+    while True:
+        try:
+            session.add(menu_data)
+            break
+        except Exception:
+            continue
     session.commit()
     session.refresh(menu_data)
     return JSONResponse(
@@ -90,11 +92,11 @@ async def delete_menu(menu_id: str, session=Depends(get_session)) -> json:
         session.delete(menu)
         session.commit()
         return JSONResponse(
-            content={"status": True, "message": "The menu has been deleted"},
+            content={"status": "true", "message": "The menu has been deleted"},
             media_type="application/json",
             status_code=200
         )
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
-        detail="menu -----" + menu_id + "------ not found!"
+        detail="menu not found"
     )

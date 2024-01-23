@@ -1,12 +1,12 @@
 from typing import Any, List, Optional
 
-from beanie import init_beanie, PydanticObjectId
+from beanie import init_beanie
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings
-from sqlmodel import SQLModel, Session, create_engine, Field, JSON
+from sqlmodel import SQLModel, Session, create_engine
 
-from models.menus import Menu
+from models.menus_tree import Menu
 
 engine = create_engine(
     'postgresql://adm:111@127.0.0.1:5431/menu_pgdb',
