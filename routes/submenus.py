@@ -11,11 +11,11 @@ from models.menus_tree import Menu, Submenu, Dish
 submenus_router = APIRouter(prefix=f"/menus", tags=["Submenu"])
 
 
-def submenu_dump(menu: Submenu) -> dict:
+def submenu_dump(submenu: Submenu) -> dict:
     return {
-        "id": menu.id,
-        "title": menu.title,
-        "description": menu.description,
+        "id": submenu.id,
+        "title": submenu.title,
+        "description": submenu.description,
         "dishes_count": 0
     }
 
@@ -37,7 +37,7 @@ async def add_menu(submenu_data: Submenu, menu_id: str, session=Depends(get_sess
 async def get_all_menus(menu_id: str, session=Depends(get_session)) -> json:
     statement = select(Submenu)
     submenu_list = session.exec(statement).all()
-    result: list[dict] = [submenu.model_dump() for submenu in submenu_list if submenu.menu_id == menu_id]
+    result: list[dict] = [submenu_dump(submenu) for submenu in submenu_list if submenu.menu_id == menu_id]
     return JSONResponse(
         content=result,
         media_type="application/json"

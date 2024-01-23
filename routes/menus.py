@@ -27,7 +27,7 @@ async def add_menu(menu_data: Menu, session=Depends(get_session)) -> json:
         try:
             session.add(menu_data)
             break
-        except Exception:
+        except:
             continue
     session.commit()
     session.refresh(menu_data)
@@ -42,7 +42,7 @@ async def add_menu(menu_data: Menu, session=Depends(get_session)) -> json:
 async def get_all_menus(session=Depends(get_session)) -> json:
     statement = select(Menu)
     menu_list = session.exec(statement).all()
-    result: list[dict] = [menu.model_dump() for menu in menu_list]
+    result: list[dict] = [menu_dump(menu) for menu in menu_list]
     return JSONResponse(
         content=result,
         media_type="application/json"
