@@ -12,16 +12,11 @@ services:
     image: postgres:14.3-alpine3.16
     container_name: menu_db
     environment:
-      POSTGRES_DB: menu_pgdb
-      POSTGRES_USER: adm
-      POSTGRES_PASSWORD: 111
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
-      - '5431:5432'
-#      POSTGRES_DB: ${DB_NAME}
-#      POSTGRES_USER: ${DB_USER}
-#      POSTGRES_PASSWORD: ${DB_PASSWORD}
-#    ports:
-#      - '5431:${DB_PORT}'
+      - "${DB_HOST_PORT}:${DB_PORT}"
     networks:
       - backend
     deploy:
@@ -33,13 +28,13 @@ services:
   pgadmin:
     image: dpage/pgadmin4:latest
     ports:
-      - "5050:80"
+      - "${PGADMIN_HOST_PORT}:${PGADMIN_PORT}"
     container_name: pgadmin
     depends_on:
       - pg_db
     environment:
       PGADMIN_DEFAULT_EMAIL: "def@mail.ru"
-      PGADMIN_DEFAULT_PASSWORD: "111"
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
       PGADMIN_CONFIG_SERVER_MODE: "False"
     volumes:
       - ./services/pgadmin:/var/lib/pgadmin
