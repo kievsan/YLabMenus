@@ -26,7 +26,7 @@
 
 	В случае появления ошибки прав доступа при запуске контейнера PgAdmin ((HTTP code 500) server error 
 	нужно:
-	a) в Docker desktop расшарить /fastapi1_menu - рабочую директорию проекта (Настройки: Resources -> File sharing -> +)
+	a) в Docker desktop расшарить рабочую директорию проекта (Настройки: Resources -> File sharing -> +)
 	б) повторить п.4
 
 ## Шаг 5
