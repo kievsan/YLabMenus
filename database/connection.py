@@ -8,11 +8,8 @@ from sqlmodel import SQLModel, Session, create_engine
 
 from models.menus_tree import Menu
 
-engine = create_engine(
-    'postgresql://adm:111@127.0.0.1:5431/menu_pgdb',
-    echo=True,
-    connect_args={}
-)
+DSN = 'postgresql://adm:111@127.0.0.1:5431/menu_pgdb'
+engine = create_engine(DSN, echo=True, connect_args={})
 
 
 def conn():
