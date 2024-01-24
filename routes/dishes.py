@@ -55,7 +55,7 @@ async def update_menu(dish_data: BaseDish,
 @dishes_router.delete("/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}", response_model=Dish)
 async def delete_menu(menu_id: str, submenu_id: str, dish_id: str, session=Depends(get_session)) -> json:
     dish = session.get(Dish, dish_id)
-    if dish and dish.submenu_id == menu_id:
+    if dish and dish.submenu_id == submenu_id:
         session.delete(dish)
         session.commit()
         return JSONResponse(
