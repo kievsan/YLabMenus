@@ -5,33 +5,32 @@ from fastapi import APIRouter, Path, Depends, HTTPException, Request, status
 from fastapi.responses import JSONResponse
 from sqlmodel import select
 
-from database.connection import get_session
+from database.connection import get_session, engine
 from models.menus_tree import Menu, BaseModel
 
 menus_router = APIRouter(prefix=f"/menus", tags=["Menu"])
 
 
-def menu_dump(menu: Menu) -> dict:
-    return {"id": menu.id, "title": menu.title, "description": menu.description,
-            "submenus_count": len(menu.submenus),
-            "dishes_count": sum([len(submenu.dishes) for submenu in menu.submenus])
-    }
-
-
 @menus_router.post("/", response_model=Menu)
 async def add_menu(menu_data: BaseModel,
                    session=Depends(get_session)) -> json:
+    # session.expire_all()
     menu = Menu(title=menu_data.title, description=menu_data.description)
+    result = menu.dump()
+
     session.add(menu)
     session.commit()
-    return JSONResponse(content=menu_dump(menu), media_type="application/json", status_code=201)
+
+    session.close()
+    engine.dispose()
+    return JSONResponse(content=result, media_type="application/json", status_code=201)
 
 
 @menus_router.get("/", response_model=List[Menu])
 async def get_all_menus(session=Depends(get_session)) -> json:
     statement = select(Menu)
     menu_list = session.exec(statement).all()
-    result: list[dict] = [menu_dump(menu) for menu in menu_list]
+    result: list[dict] = [menu.dump() for menu in menu_list]
     return JSONResponse(content=result, media_type="application/json")
 
 
@@ -40,7 +39,8 @@ async def get_menu(menu_id: str = Path(..., title="ID to retrieve"),
                    session=Depends(get_session)) -> json:
     menu = session.get(Menu, menu_id)
     if menu:
-        return JSONResponse(content=menu_dump(menu), media_type="application/json")
+        session.refresh(menu)
+        return JSONResponse(content=menu.dump(), media_type="application/json")
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="menu not found")
 
 
@@ -53,7 +53,8 @@ async def update_menu(menu_data: BaseModel,
         menu.title = menu_data.title
         menu.description = menu_data.description
         session.commit()
-        return JSONResponse(content=menu_dump(menu), media_type="application/json", status_code=200)
+        session.refresh(menu)
+        return JSONResponse(content=menu.dump(), media_type="application/json", status_code=200)
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="menu not found")
 
 
@@ -63,6 +64,7 @@ async def delete_menu(menu_id: str, session=Depends(get_session)) -> json:
     if menu:
         session.delete(menu)
         session.commit()
+        session.refresh(menu)
         return JSONResponse(
             content={"status": "true", "message": "The menu has been deleted"},
             media_type="application/json", status_code=200
